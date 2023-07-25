@@ -25,6 +25,7 @@ app.use(cors());
 app.use("/fruits", express.json());
 
 
+
 function saveJSFile() {
     let fullString = "const fruits = ";
     fullString += JSON.stringify(fruits);
@@ -144,7 +145,9 @@ app.post('/fruits', (req, res) => {
     console.log(fruit["name"].toLowerCase());
 
     if (validFruit(fruit)) {
-        const foundFruit = fruits.find((fruitItem) => fruitItem.name.toLowerCase() === fruit["name"].toLowerCase());
+        const foundFruit = fruits.find(function (fruitItem) {
+            fruitItem.name.toLowerCase() === fruit["name"].toLowerCase()
+        });
         
         if (foundFruit == undefined) {
             fruit["id"] = generateID(9999);
@@ -184,6 +187,23 @@ app.get('/fruits/:name', (req, res) => {
     console.log(fruit);
     // console.log(fruits);
     res.send(fruit);
+});
+
+app.delete("/fruits/:name", (req, res) => {
+    // First check if fruit exists
+    const name = req.params.name.toLowerCase();
+    const fruitIndex = fruits.findIndex((fruit) => fruit.name.toLowerCase() == name);
+
+    if (fruitIndex == -1) {
+        // Fruit cannot be found, return 404
+        res.status(404).send("The fruit doesn't exist.");
+    } else {
+        // Fruit found. Use the array index found to remove it from the array
+        fruits.splice(fruitIndex, 1);
+
+        // Return no content status code
+        res.sendStatus(204);
+    }
 });
 
 // app.get('/penguins', (req, res) => {
